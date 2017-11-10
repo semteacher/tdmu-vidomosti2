@@ -130,7 +130,7 @@ class DocumentsController extends Controller
                 return '\tmp\formGeneralStat.doc';
                 break;
             case "bk":
-                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'.DIRECTORY_SEPARATOR .'formGeneralBKStat.doc', $doc->formGeneralBKStat()['body']);
+                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'.DIRECTORY_SEPARATOR .'formGeneralBKStat.doc', $doc->formGeneralBKStat(true)['body']);
                 return '\tmp\formGeneralBKStat.doc';
                 break;
             case "detailed":
