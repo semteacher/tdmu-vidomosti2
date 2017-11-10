@@ -17,6 +17,8 @@ class Statistics extends Model
 {
 
     protected $DOC_PATH; // for puts files
+	
+	public $docfilename;
 
     protected $studentsOfGroup; // Students of group
 
@@ -59,6 +61,13 @@ class Statistics extends Model
          */
         $this->speciality = CacheSpeciality::getSpeciality($this->dataOfFile->first()->SpecialityId)->name;
         $this->department = CacheDepartment::getDepartment($this->dataOfFile->first()->DepartmentId)->name;
+		
+		//construct the filename for downloading
+		$tmpdepartment = ($this->department == 'факультет по роботі з іноземними студентами') ? 'Факультет іноземних студентів' : $this->mb_ucfirst($this->department);
+		$tmpdocfilename = $tmpdepartment .'_'. $this->dataOfFile[0]->Semester . '-cеместр_групи-' .$this->_getAllGroup() .'_'. date('d-m-Y', strtotime($this->dataOfFile[0]->created_at));
+		$tmpdocfilename = transliterator_transliterate ('Any-Latin; [\u0100-\u7fff] Remove; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC; Lower();', $tmpdocfilename);
+		$tmpdocfilename = preg_replace('/[^A-Za-z0-9_-]/', '_', $tmpdocfilename );
+		$this->docfilename = transliterator_transliterate ('Ukrainian-Latin/BGN', $tmpdocfilename);
     }
 
     /**
@@ -87,7 +96,7 @@ class Statistics extends Model
 
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.gStat");
-		if ($isDownload) {$this->shablons['body'] .= $this->HTMLHeader();}
+		if ($isDownload) {$this->shablons['body'] .= $this->HTML2DOCHeader();}
         $this->shablons['body'] .= $this->formHeader();
         $this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>
 		<table class="table table-hover" style="width:100%; font-size:9pt;" border="1">';
@@ -97,7 +106,7 @@ class Statistics extends Model
 
         $this->shablons['body'] .= $table.'</table>';
 //        $this->shablons['body'] .= $this->formFooter();
-		if ($isDownload) {$this->shablons['body'] .= $this->HTMLFooter();}
+		if ($isDownload) {$this->shablons['body'] .= $this->HTML2DOCFooter();}
         return $this->shablons;
     }
 
@@ -132,15 +141,16 @@ class Statistics extends Model
         }
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.gBCStat");
-		if ($isDownload) {$this->shablons['body'] .= $this->HTMLHeader();}
-        $this->shablons['body'] .= $this->formHeader('<p>Кількість студентів ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')</p>');
-        $this->shablons['body'] .= '<br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%) <table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
+		if ($isDownload) {$this->shablons['body'] .= $this->HTML2DOCHeader();}
+        $this->shablons['body'] .= $this->formHeader('Кількість студентів ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')');
+        $this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>
+		<table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
         $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість контрактних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Кількість контрактних студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість контрактних студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість контрактних студентів , що склали дисципліну на \'відмінно\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'відмінно\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Cередній бал контрактних студентів</td><td>Cередній бал державних студентів </td> <td>Середній бал поточної успішності контрактних студентів</td><td>Середній бал поточної успішності державних студентів</td></tr>';
         $this->shablons['body'] .= $table.'</table>';
 //        $this->shablons['body'] .= $this->formFooter();
-		if ($isDownload) {$this->shablons['body'] .= $this->HTMLFooter();}
+		if ($isDownload) {$this->shablons['body'] .= $this->HTML2DOCFooter();}
         return $this->shablons;
     }
 
@@ -183,23 +193,20 @@ class Statistics extends Model
     {
         $this->department = ($this->department == 'факультет по роботі з іноземними студентами') ? 'Факультет іноземних студентів' : $this->mb_ucfirst($this->department);
         $text = '';
-        $text .= '<p align=center>
-        '. $this->department .', '.$this->findSemester().' - курс, групи:'.$this->_getAllGroup().', '.(($this->sumGrades['gradeOfFiveTypes']['type']=='exam')?' Іспит "' . $this->dataOfFile[0]->NameDiscipline . '"' : ' Диференційований залік' ).', '. date('d.m.Y') .'
-        </p><br>
+        $text .= '<p align=center><strong>'. $this->department .', '.$this->findSemester().' - курс, групи: '.$this->_getAllGroup().', '.(($this->sumGrades['gradeOfFiveTypes']['type']=='exam')?' Іспит "' . $this->dataOfFile[0]->NameDiscipline . '"' : ' Диференційований залік' ).', '. date('d.m.Y', strtotime($this->dataOfFile[0]->created_at)) .'</strong></p>'.$beforeTable.'<br>';
 
-        '.$beforeTable.'<br>';
         return $text;
     }
 
     public function formFooter()
     {
         $text = '';
-		$text .= '</table>Загальні дані <br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)';
+		$text .= '</table>Загальні дані: <br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)';
 
         return $text;
     }
 	
-	public function HTMLHeader()
+	public function HTML2DOCHeader()
     {
 		$text = '';
         $text .= '<!DOCTYPE html><html><head><meta charset=\"UTF-8\">';
@@ -213,10 +220,12 @@ html, body {
 }
 th {
     border: solid 1px #999;
+	padding: 2px;
     background: #eee;
 }
 td {
     border: solid 1px #999;
+	padding: 2px;
     background: #fff;
 }
 tr:hover td {
@@ -235,7 +244,7 @@ table {
         return $text;
 	}
 
-	public function HTMLFooter()
+	public function HTML2DOCFooter()
     {
 		$text = '';
         $text .= '</body></html>';
