@@ -67,8 +67,21 @@ class Statistics extends Model
 		//create list of modules by discipline - disable - not used
 		//$this->modulesByDiscipline = $this->getModulesListByDiscipline();
 		//construct the filename for downloading
+		switch($this->dataOfFile[0]->type_exam_id){
+			case 1:
+				$tmpexamtype = 'модуль';
+				break;
+			case 2:
+				$tmpexamtype = 'іспит';
+				break;
+			case 3:
+				$tmpexamtype = 'дифзалік';
+				break;
+			default:
+				$tmpexamtype = '';
+		}
 		$tmpdepartment = ($this->department == 'факультет по роботі з іноземними студентами') ? 'Факультет іноземних студентів' : $this->mb_ucfirst($this->department);
-		$tmpdocfilename = $tmpdepartment .'_'. $this->dataOfFile[0]->Semester . '-cеместр_групи-' .$this->_getAllGroup() .'_'. date('d-m-Y', strtotime($this->dataOfFile[0]->created_at));
+		$tmpdocfilename = $tmpdepartment .'_'. $this->dataOfFile[0]->Semester . '-cеместр_групи-' .$this->_getAllGroup() .'_'. $tmpexamtype .'_'. date('d-m-Y', strtotime($this->dataOfFile[0]->created_at));
 		$tmpdocfilename = transliterator_transliterate ('Any-Latin; [\u0100-\u7fff] Remove; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC; Lower();', $tmpdocfilename);
 		$this->docfilename = preg_replace('/[^A-Za-z0-9_-]/', '_', $tmpdocfilename );
 		//$this->docfilename = $tmpdocfilename;
