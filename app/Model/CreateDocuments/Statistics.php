@@ -66,8 +66,9 @@ class Statistics extends Model
 		$tmpdepartment = ($this->department == 'факультет по роботі з іноземними студентами') ? 'Факультет іноземних студентів' : $this->mb_ucfirst($this->department);
 		$tmpdocfilename = $tmpdepartment .'_'. $this->dataOfFile[0]->Semester . '-cеместр_групи-' .$this->_getAllGroup() .'_'. date('d-m-Y', strtotime($this->dataOfFile[0]->created_at));
 		$tmpdocfilename = transliterator_transliterate ('Any-Latin; [\u0100-\u7fff] Remove; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC; Lower();', $tmpdocfilename);
-		$tmpdocfilename = preg_replace('/[^A-Za-z0-9_-]/', '_', $tmpdocfilename );
-		$this->docfilename = transliterator_transliterate ('Ukrainian-Latin/BGN', $tmpdocfilename);
+		$this->docfilename = preg_replace('/[^A-Za-z0-9_-]/', '_', $tmpdocfilename );
+		//$this->docfilename = $tmpdocfilename;
+		//$this->docfilename = transliterator_transliterate ('Ukrainian-Latin/BGN', $tmpdocfilename);
     }
 
     /**

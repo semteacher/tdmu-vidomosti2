@@ -113,7 +113,6 @@ class DocumentsController extends Controller
         $data['general'] = $doc->formGeneralStat();
         $data['bk'] = $doc->formGeneralBKStat();
         $data['detailed'] = $doc->formDetailedStat();
-//var_dump($doc->docfilename);
         return view('admin.documents.allStatistics',compact('data','idFileGrade'));
     }
 
@@ -123,7 +122,6 @@ class DocumentsController extends Controller
      */
     public function downloadStatistics($name,$idFileGrade){
         $doc = new Statistics($idFileGrade);
-//var_dump($doc->docfilename);
         File::makeDirectory(public_path() .DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR .'stat', 0775, true, true);
 		File::cleanDirectory(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat');
         switch($name){
