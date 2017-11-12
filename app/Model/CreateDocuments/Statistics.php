@@ -37,6 +37,8 @@ class Statistics extends Model
     protected $idFileGrade = 0;
 
     protected $shablons = [];
+	
+	protected $modulesByDiscipline = []; //number of modules per discipline
 
     private $sumGrades = [];
 
@@ -62,6 +64,8 @@ class Statistics extends Model
         $this->speciality = CacheSpeciality::getSpeciality($this->dataOfFile->first()->SpecialityId)->name;
         $this->department = CacheDepartment::getDepartment($this->dataOfFile->first()->DepartmentId)->name;
 		
+		//create list of modules by discipline - disable - not used
+		//$this->modulesByDiscipline = $this->getModulesListByDiscipline();
 		//construct the filename for downloading
 		$tmpdepartment = ($this->department == 'факультет по роботі з іноземними студентами') ? 'Факультет іноземних студентів' : $this->mb_ucfirst($this->department);
 		$tmpdocfilename = $tmpdepartment .'_'. $this->dataOfFile[0]->Semester . '-cеместр_групи-' .$this->_getAllGroup() .'_'. date('d-m-Y', strtotime($this->dataOfFile[0]->created_at));
@@ -78,11 +82,20 @@ class Statistics extends Model
     {
         $table = '';
         $i = 1;
+//var_dump($this->dataOfFile);
+//var_dump($this->modulesByDiscipline);
         foreach ($this->dataOfFile as $this->dataEachOfFile) {
             $this->studentOfModule = Grades::where('grade_file_id', $this->dataEachOfFile->id)->get();
             $this->sumGrades = $this->getSumGradesFromEachStudent();
             $table .= '<tr><td>' . $i . '</td><td>' . $this->findSemester() . '</td>';
-            $table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
+//var_dump(count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]));
+			//if (count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]) > 1 ){ //by number - improper
+			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
+				$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
+			} else {
+				$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . '</td>';
+			}
+            //$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
             $table .= '<td>' . count($this->studentOfModule) . '</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['2'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['2'] / count($this->studentOfModule)*100, 2).'%)</td>
                     <td>'.($this->sumGrades['gradeOfFiveTypes']['stat']['B']['3']+$this->sumGrades['gradeOfFiveTypes']['stat']['C']['3']).' ('.number_format(($this->sumGrades['gradeOfFiveTypes']['stat']['C']['3']+$this->sumGrades['gradeOfFiveTypes']['stat']['B']['3']) / count($this->studentOfModule)*100, 2).'%)</td>
@@ -122,7 +135,13 @@ class Statistics extends Model
             $this->studentOfModule = Grades::where('grade_file_id', $this->dataEachOfFile->id)->get();
             $this->sumGrades = $this->getSumGradesFromEachStudent();
             $table .= '<tr><td>' . $i . '</td><td>' . $this->findSemester() . '</td>';
-            $table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
+			//if (count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]) > 1 ){
+			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
+				$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
+			} else {
+				$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . '</td>';
+			}
+            //$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
             $table .= '<td>' . count($this->studentOfModule) . '</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['C']['2'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['2'] / count($this->studentOfModule)*100, 2).'%)</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['B']['2'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['2'] / count($this->studentOfModule)*100, 2).'%)</td>
@@ -168,7 +187,13 @@ class Statistics extends Model
                     $studentForForm[$student->group][$student->id_student][$this->dataEachOfFile->id]['examGrade'] = $student->exam_grade;
                     $studentForForm[$student->group][$student->id_student]['fio'] = $student->fio;
                 }
-            $this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline.' - ('.$this->dataEachOfFile->ModuleNum.'.'.$this->dataEachOfFile->NameModule.')';
+            //if (count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]) > 1 ){
+			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
+				$this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline.' - ('.$this->dataEachOfFile->ModuleNum.'.'.$this->dataEachOfFile->NameModule.')';
+			} else {
+				$this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline;
+			}
+			//$this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline.' - ('.$this->dataEachOfFile->ModuleNum.'.'.$this->dataEachOfFile->NameModule.')';
             $this->shablons['body'] .= '<table width="100%"><tr><td width="50%"><b>Grade</b></td><td><b>Exam Grade</b></td></tr></table></td>';
         }
 
@@ -270,6 +295,22 @@ table {
         $sum['gradeOfFiveTypes'] = $this->convertGrades();
         return $sum;
     }
+	
+	//create array of pairs "modules id's-names" by discipline
+	private function getModulesListByDiscipline()
+    {
+		$tmpModulesList = [];
+		foreach ($this->dataOfFile as $this->dataEachOfFile) {
+			if (array_key_exists($this->dataEachOfFile->DisciplineVariantID,$tmpModulesList)){
+				if (!array_key_exists($this->dataEachOfFile->ModuleNum,$tmpModulesList[$this->dataEachOfFile->DisciplineVariantID])){
+					$tmpModulesList[$this->dataEachOfFile->DisciplineVariantID][$this->dataEachOfFile->ModuleNum] = $this->dataEachOfFile->NameModule;
+				}
+			} else {
+				$tmpModulesList[$this->dataEachOfFile->DisciplineVariantID][$this->dataEachOfFile->ModuleNum] = $this->dataEachOfFile->NameModule;
+			}
+		}
+		return $tmpModulesList;
+	}
 
     private function convertGrades(){
         $qty = ($this->dataEachOfFile->qty_questions)?$this->dataEachOfFile->qty_questions:24; /*small bag fix because , because , because )))) ahahaha*/
