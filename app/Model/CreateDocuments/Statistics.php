@@ -84,8 +84,6 @@ class Statistics extends Model
 		$tmpdocfilename = $tmpdepartment .'_'. $this->dataOfFile[0]->Semester . '-cеместр_групи-' .$this->_getAllGroup() .'_'. $tmpexamtype .'_'. date('d-m-Y', strtotime($this->dataOfFile[0]->created_at));
 		$tmpdocfilename = transliterator_transliterate ('Any-Latin; [\u0100-\u7fff] Remove; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC; Lower();', $tmpdocfilename);
 		$this->docfilename = preg_replace('/[^A-Za-z0-9_-]/', '_', $tmpdocfilename );
-		//$this->docfilename = $tmpdocfilename;
-		//$this->docfilename = transliterator_transliterate ('Ukrainian-Latin/BGN', $tmpdocfilename);
     }
 
     /**
@@ -95,20 +93,16 @@ class Statistics extends Model
     {
         $table = '';
         $i = 1;
-//var_dump($this->dataOfFile);
-//var_dump($this->modulesByDiscipline);
         foreach ($this->dataOfFile as $this->dataEachOfFile) {
             $this->studentOfModule = Grades::where('grade_file_id', $this->dataEachOfFile->id)->get();
             $this->sumGrades = $this->getSumGradesFromEachStudent();
             $table .= '<tr><td>' . $i . '</td><td>' . $this->findSemester() . '</td>';
-//var_dump(count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]));
 			//if (count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]) > 1 ){ //by number - improper
 			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
 				$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
 			} else {
 				$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . '</td>';
 			}
-            //$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
             $table .= '<td>' . count($this->studentOfModule) . '</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['2'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['2'] / count($this->studentOfModule)*100, 2).'%)</td>
                     <td>'.($this->sumGrades['gradeOfFiveTypes']['stat']['B']['3']+$this->sumGrades['gradeOfFiveTypes']['stat']['C']['3']).' ('.number_format(($this->sumGrades['gradeOfFiveTypes']['stat']['C']['3']+$this->sumGrades['gradeOfFiveTypes']['stat']['B']['3']) / count($this->studentOfModule)*100, 2).'%)</td>
@@ -154,7 +148,6 @@ class Statistics extends Model
 			} else {
 				$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . '</td>';
 			}
-            //$table .= '<td>' . $this->dataEachOfFile->NameDiscipline . ' - ' . $this->dataEachOfFile->ModuleNum . '. ' . $this->dataEachOfFile->NameModule . '</td>';
             $table .= '<td>' . count($this->studentOfModule) . '</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['C']['2'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['2'] / count($this->studentOfModule)*100, 2).'%)</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['B']['2'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['2'] / count($this->studentOfModule)*100, 2).'%)</td>
@@ -206,7 +199,6 @@ class Statistics extends Model
 			} else {
 				$this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline;
 			}
-			//$this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline.' - ('.$this->dataEachOfFile->ModuleNum.'.'.$this->dataEachOfFile->NameModule.')';
             $this->shablons['body'] .= '<table width="100%"><tr><td width="50%"><b>Grade</b></td><td><b>Exam Grade</b></td></tr></table></td>';
         }
 
