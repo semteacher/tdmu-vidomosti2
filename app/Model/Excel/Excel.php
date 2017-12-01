@@ -151,7 +151,7 @@ class Excel extends Model
                 $grades['code'] = (int)$secondSheets['code'];
                 $grades['id_student'] = (string)$secondSheets['id'];
                 $grades['fio'] = $secondSheets['fio'];
-                $grades['group'] = (int)$secondSheets['group'];
+                $grades['group'] = (string)$secondSheets['group'];
                 $grades['grade'] = (int)$this->threeSheets[(string)$secondSheets['id']][$module];
                 if($this->checkEachStudent===false){$this->fiveSheets[$grades['id_student']][$module]=true;}
                 if($this->fiveSheets[$grades['id_student']][$module]) {
