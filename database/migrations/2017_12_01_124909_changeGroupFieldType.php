@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSettingTable extends Migration
+class ChangeGroupFieldType extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,9 @@ class CreateSettingTable extends Migration
      */
     public function up()
     {
-		Schema::table('grades', function ($table) {
-			$table->string('group',25)->change();
-		});
+		Schema::table('grades', function (Blueprint $table) {
+			$table->string('group', 25)->change();
+		});		
     }
 
     /**
@@ -24,7 +24,7 @@ class CreateSettingTable extends Migration
      */
     public function down()
     {
-		Schema::table('grades', function ($table) {
+		Schema::table('grades', function (Blueprint $table) {
 			$table->integer('group')->change();
 		});
     }
