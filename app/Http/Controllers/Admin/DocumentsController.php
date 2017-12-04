@@ -113,7 +113,6 @@ class DocumentsController extends Controller
         $data['general'] = $doc->formGeneralStat();
         $data['bk'] = $doc->formGeneralBKStat();
         $data['detailed'] = $doc->formDetailedStat();
-
         return view('admin.documents.allStatistics',compact('data','idFileGrade'));
     }
 
@@ -123,19 +122,20 @@ class DocumentsController extends Controller
      */
     public function downloadStatistics($name,$idFileGrade){
         $doc = new Statistics($idFileGrade);
-        File::makeDirectory(public_path() .DIRECTORY_SEPARATOR . 'tmp', 0775, true, true);
+        File::makeDirectory(public_path() .DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR .'stat', 0775, true, true);
+		File::cleanDirectory(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat');
         switch($name){
             case "general":
-                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'.DIRECTORY_SEPARATOR .'formGeneralStat.doc', $doc->formGeneralStat()['body']);
-                return '\tmp\formGeneralStat.doc';
+                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename . '-formGeneralStat.doc', $doc->formGeneralStat()['body']);
+                return DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formGeneralStat.doc';
                 break;
             case "bk":
-                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'.DIRECTORY_SEPARATOR .'formGeneralBKStat.doc', $doc->formGeneralBKStat()['body']);
-                return '\tmp\formGeneralBKStat.doc';
+                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formGeneralBKStat.doc', $doc->formGeneralBKStat(true)['body']);
+                return DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formGeneralBKStat.doc';
                 break;
             case "detailed":
-                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'.DIRECTORY_SEPARATOR .'formDetailedStat.doc', $doc->formDetailedStat()['body']);
-                return '\tmp\formDetailedStat.doc';
+                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'formDetailedStat.doc', $doc->formDetailedStat()['body']);
+                return DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formDetailedStat.doc';
                 break;
         }
     }
