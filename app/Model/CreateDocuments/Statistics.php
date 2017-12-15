@@ -117,10 +117,15 @@ class Statistics extends Model
 
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.gStat");
-		if ($isDownload) {$this->shablons['body'] .= $this->HTML2DOCHeader();}
-        $this->shablons['body'] .= $this->formHeader();
-        $this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>
-		<table class="table table-hover" style="width:100%; font-size:9pt;" border="1">';
+		if ($isDownload) {
+			$this->shablons['body'] .= $this->HTML2DOCHeader();
+			$this->shablons['body'] .= $this->formHeader();
+			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+		} else {
+			$this->shablons['body'] .= $this->formHeader();
+			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+		}
+		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1">';
         $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Кількість студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість студентів , що склали дисципліну на \'відмінно\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Cередній бал </td> <td>Середній бал поточної успішності</td><td>Важкі</td><td>Легкі</td><td>Середній показник</td></tr>';
@@ -167,10 +172,16 @@ class Statistics extends Model
         }
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.gBCStat");
-		if ($isDownload) {$this->shablons['body'] .= $this->HTML2DOCHeader();}
-        $this->shablons['body'] .= $this->formHeader('Кількість студентів ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')');
-        $this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>
-		<table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
+		if ($isDownload) {
+			$this->shablons['body'] .= $this->HTML2DOCHeader();
+			$this->shablons['body'] .= $this->formHeader();
+			$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')</p>';
+			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+		} else {
+			$this->shablons['body'] .= $this->formHeader('Кількість студентів ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')');
+			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+		}
+		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
         $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість контрактних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Кількість контрактних студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість контрактних студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість контрактних студентів , що склали дисципліну на \'відмінно\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'відмінно\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Cередній бал контрактних студентів</td><td>Cередній бал державних студентів </td> <td>Середній бал поточної успішності контрактних студентів</td><td>Середній бал поточної успішності державних студентів</td></tr>';
@@ -224,7 +235,8 @@ class Statistics extends Model
     {
         $this->department = ($this->department == 'факультет по роботі з іноземними студентами') ? 'Факультет іноземних студентів' : $this->mb_ucfirst($this->department);
         $text = '';
-        $text .= '<p align=center><strong>'. $this->department .', '.$this->findSemester().' - курс, групи: '.$this->_getAllGroup().', '.(($this->sumGrades['gradeOfFiveTypes']['type']=='exam')?' Іспит "' . $this->dataOfFile[0]->NameDiscipline . '"' : ' Диференційований залік' ).', '. date('d.m.Y', strtotime($this->dataOfFile[0]->created_at)) .'</strong></p>'.$beforeTable.'<br>';
+        $text .= '<p align=center style="font-size:12pt;"><strong>'. $this->department .', '.$this->findSemester().' - курс, групи: '.$this->_getAllGroup().', '.(($this->sumGrades['gradeOfFiveTypes']['type']=='exam')?' Іспит "' . $this->dataOfFile[0]->NameDiscipline . '"' : ' Диференційований залік' ).', '. date('d.m.Y', strtotime($this->dataOfFile[0]->created_at)) .'</strong></p>';
+		if ($beforeTable <> '') { $text .= $beforeTable.'<br>';	}
 
         return $text;
     }
@@ -245,8 +257,8 @@ class Statistics extends Model
 html, body {
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
-    font-size: 13px;
+    font-family: "Times New Roman", Georgia, Serif;
+    font-size: 12px;
     background: #eee;
 }
 th {

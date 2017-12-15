@@ -126,7 +126,7 @@ class DocumentsController extends Controller
 		File::cleanDirectory(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat');
         switch($name){
             case "general":
-                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename . '-formGeneralStat.doc', $doc->formGeneralStat()['body']);
+                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename . '-formGeneralStat.doc', $doc->formGeneralStat(true)['body']);
                 return DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formGeneralStat.doc';
                 break;
             case "bk":
