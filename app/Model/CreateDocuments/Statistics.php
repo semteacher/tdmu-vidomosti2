@@ -175,10 +175,10 @@ class Statistics extends Model
 		if ($isDownload) {
 			$this->shablons['body'] .= $this->HTML2DOCHeader();
 			$this->shablons['body'] .= $this->formHeader();
-			$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')</p>';
+			$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])) .' ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')</p>';
 			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 		} else {
-			$this->shablons['body'] .= $this->formHeader('Кількість студентів ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')');
+			$this->shablons['body'] .= $this->formHeader('Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])).' ( Бюджет - ' . $this->EDUBASISID["B"] . ', Контракт - ' . $this->EDUBASISID["C"] .')');
 			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 		}
 		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
