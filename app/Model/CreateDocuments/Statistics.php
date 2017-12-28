@@ -47,6 +47,8 @@ class Statistics extends Model
     private $conver = [];
 
     private $EDUBASISID = [];
+	
+	private $AllStudentsEduBasisid = [];
 
     public function __construct($idFileGrade)
     {
@@ -120,10 +122,12 @@ class Statistics extends Model
 		if ($isDownload) {
 			$this->shablons['body'] .= $this->HTML2DOCHeader();
 			$this->shablons['body'] .= $this->formHeader();
-			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			//$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		} else {
 			$this->shablons['body'] .= $this->formHeader();
-			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			//$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		}
 		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1">';
         $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)';
@@ -170,16 +174,23 @@ class Statistics extends Model
             $table .= '</td></tr>';
             $i++;
         }
+		//new method to calc total students
+		$this->EDUBASISIDLocal = $this->getSumContractOrButjetStudentLocal();
+		
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.gBCStat");
 		if ($isDownload) {
 			$this->shablons['body'] .= $this->HTML2DOCHeader();
 			$this->shablons['body'] .= $this->formHeader();
-			$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])) .' ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')</p>';
-			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			//$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])) .' ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')</p>';
+			$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')</p>';
+			//$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		} else {
-			$this->shablons['body'] .= $this->formHeader('Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])).' ( Бюджет - ' . $this->EDUBASISID["B"] . ', Контракт - ' . $this->EDUBASISID["C"] .')');
-			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			//$this->shablons['body'] .= $this->formHeader('Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])).' ( Бюджет - ' . $this->EDUBASISID["B"] . ', Контракт - ' . $this->EDUBASISID["C"] .')');
+			$this->shablons['body'] .= $this->formHeader('Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')');
+			//$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
+			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		}
 		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
         $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість контрактних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)';
@@ -244,7 +255,8 @@ class Statistics extends Model
     public function formFooter()
     {
         $text = '';
-		$text .= '</table>Загальні дані: <br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)';
+		//$text .= '</table>Загальні дані: <br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)';
+		$text .= '</table>Загальні дані: <br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)';
 
         return $text;
     }
@@ -342,6 +354,7 @@ table {
 
         foreach ($this->studentOfModule as $student) {
             $eduBasisid = Students::getStudentEDUBASISID($student->id_student);
+			$this->AllStudentsEduBasisid[$student->id_student] = $eduBasisid;
             if($student->exam_grade==0) {
                 $data['stat'][$eduBasisid]['2']++;
                 $data['stat']['2']++;
@@ -359,6 +372,14 @@ table {
         return $data;
     }
 
+    private function getSumContractOrButjetStudentLocal(){
+        $basisid = ['C'=>0,'B'=>0];
+        foreach($this->AllStudentsEduBasisid as $studentId=>$eduBasisId){
+			$eduBasisId ==='C'?$basisid['C']++:$basisid['B']++;
+        }
+        return $basisid;
+    }
+	
     private function mb_ucfirst($value)
     {
         $firstLetter = mb_strtoupper(mb_substr($value, 0, 1), 'UTF-8');
