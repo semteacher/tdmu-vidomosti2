@@ -116,16 +116,20 @@ class Statistics extends Model
             $table .= '</td><td></td><td></td><td></tr>';
             $i++;
         }
+        //new method to calc total students
+		$this->EDUBASISIDLocal = $this->getSumContractOrButjetStudentLocal();
 
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.gStat");
 		if ($isDownload) {
 			$this->shablons['body'] .= $this->HTML2DOCHeader();
 			$this->shablons['body'] .= $this->formHeader();
+            $this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')</p>';
 			//$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		} else {
-			$this->shablons['body'] .= $this->formHeader();
+			//$this->shablons['body'] .= $this->formHeader();
+            $this->shablons['body'] .= $this->formHeader('Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')');
 			//$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		}
