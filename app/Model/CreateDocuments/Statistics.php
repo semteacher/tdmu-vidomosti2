@@ -231,7 +231,7 @@ class Statistics extends Model
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.detailStat");
         $this->shablons['body'] .= $this->formHeader();
-        $this->shablons['body'] .= '<tr><td>Група</td><td>П.І.Б</td>';
+        
         foreach ($this->dataOfFile as $this->dataEachOfFile) {
             $this->studentOfModule = Grades::where('grade_file_id', $this->dataEachOfFile->id)->get()->sortBy('group');
                 foreach ($this->studentOfModule as $student) {
@@ -239,15 +239,24 @@ class Statistics extends Model
                     $studentForForm[$student->group][$student->id_student][$this->dataEachOfFile->id]['examGrade'] = $student->exam_grade;
                     $studentForForm[$student->group][$student->id_student]['fio'] = $student->fio;
                 }
-            //if (count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]) > 1 ){
-			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
-				$this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline.' - ('.$this->dataEachOfFile->ModuleNum.'.'.$this->dataEachOfFile->NameModule.')';
-			} else {
-				$this->shablons['body'] .= '<td>'.$this->dataEachOfFile->NameDiscipline;
-			}
-            $this->shablons['body'] .= '<table width="100%"><tr><td width="50%"><b>Grade</b></td><td><b>Exam Grade</b></td></tr></table></td>';
         }
 
+        $this->shablons['body'] .= '<table width="100%">';
+        $this->shablons['body'] .= '<tr>';
+        $this->shablons['body'] .= '<th>Група</th><th style="min-width:200px">П.І.Б</th>';
+        foreach ($this->dataOfFile as $this->dataEachOfFile) {
+			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
+				$this->shablons['body'] .= '<th>'.$this->dataEachOfFile->NameDiscipline.' - ('.$this->dataEachOfFile->ModuleNum.'.'.$this->dataEachOfFile->NameModule.')'.'</th>';
+			} else {
+				$this->shablons['body'] .= '<th>'.$this->dataEachOfFile->NameDiscipline.'</th>';
+			}            
+        }
+        $this->shablons['body'] .= '</tr>';
+        $this->shablons['body'] .= '<tr>';
+        $this->shablons['body'] .= '<th>-</th><th>-</th>';
+        foreach ($this->dataOfFile as $this->dataEachOfFile) {
+            $this->shablons['body'] .= '<th><table width="100%"><tr><td width="50%"><b>Grade</b></td><td><b>Exam Grade</b></td></tr></table></th>';
+        }
         $this->shablons['body'] .= '</tr>';
             foreach ($studentForForm as $keyGroup=>$group) {
                 foreach ($group as $students) {
@@ -261,7 +270,8 @@ class Statistics extends Model
                     $this->shablons['body'] .= '</tr>';
                 }
             }
-		//$this->shablons['body'] .= '</table>';	
+        $this->shablons['body'] .= '</table>';
+
         $this->shablons['body'] .= $this->formFooter();
         return $this->shablons;
     }
