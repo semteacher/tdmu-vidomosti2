@@ -171,10 +171,30 @@ class Statistics extends Model
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['C']['5'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['5'] / count($this->studentOfModule)*100, 2).'%)</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['B']['5'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['5'] / count($this->studentOfModule)*100, 2).'%)</td>
                     ';
-            $table .= '<td>' . number_format($this->sumGrades['examGrade'] / count($this->studentOfModule), 2) . '</td>';
-            $table .= '<td>' . number_format($this->sumGrades['examGrade'] / count($this->studentOfModule), 2) . '</td>';
-            $table .= '<td>' . number_format($this->sumGrades['grade'] / count($this->studentOfModule), 2) . '</td>';
-            $table .= '<td>' . number_format($this->sumGrades['grade'] / count($this->studentOfModule), 2) . '</td>';
+            //$table .= '<td>' . number_format($this->sumGrades['examGrade'] / count($this->studentOfModule), 2) . '</td>';
+            //$table .= '<td>' . number_format($this->sumGrades['examGrade'] / count($this->studentOfModule), 2) . '</td>';
+            //$table .= '<td>' . number_format($this->sumGrades['grade'] / count($this->studentOfModule), 2) . '</td>';
+            //$table .= '<td>' . number_format($this->sumGrades['grade'] / count($this->studentOfModule), 2) . '</td>';
+            if ($this->EDUBASISIDLocal["C"] > 0) {
+                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['sumExamGrade'] / $this->EDUBASISIDLocal["C"], 2) . '</td>';
+            } else {
+                $table .= '<td>0</td>';
+            }
+            if ($this->EDUBASISIDLocal["B"] > 0) {
+                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['sumExamGrade'] / $this->EDUBASISIDLocal["B"], 2) . '</td>';
+            } else {
+                $table .= '<td>0</td>';
+            }
+            if ($this->EDUBASISIDLocal["C"] > 0) {
+                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['sumGrade'] / $this->EDUBASISIDLocal["C"], 2) . '</td>';
+            } else {
+                $table .= '<td>0</td>';
+            }
+            if ($this->EDUBASISIDLocal["B"] > 0) {
+                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['sumGrade'] / $this->EDUBASISIDLocal["B"], 2) . '</td>';
+            } else {
+                $table .= '<td>0</td>';
+            }
             $table .= '</td></tr>';
             $i++;
         }
@@ -348,21 +368,25 @@ table {
     private function convertGrades(){
         $qty = ($this->dataEachOfFile->qty_questions)?$this->dataEachOfFile->qty_questions:24; /*small bag fix because , because , because )))) ahahaha*/
         //check if discipline is assigned to department!
-        if (empty((AllowedDiscipline::where('arrayAllowed', 'like', '%'.$this->dataEachOfFile->DisciplineVariantID.'%')->get()->first()))){
+        //TODO: check if possibl to use elsewhere $this->dataEachOfFile->type_exam_id instead of hell below
+        if (($this->dataEachOfFile->type_exam_id == 2) && empty((AllowedDiscipline::where('arrayAllowed', 'like', '%'.$this->dataEachOfFile->DisciplineVariantID.'%')->get()->first()))){
             throw new \Exception('TDMU-Discipline not in "AllowedDiscipline"! Check if it assigned to department...');
         } /*small bug fix because , because )))) 2018 - ahahaha*/
         $type = ($this->dataEachOfFile->type_exam_id==2)?'exam':($this->dataEachOfFile->type_exam_id==1)?(AllowedDiscipline::where('arrayAllowed', 'like', '%'.$this->dataEachOfFile->DisciplineVariantID.'%')->get()->first())?'exam':'dz':'dz';
         $fromConfigArray = $this->conver[$type][$qty];
 
         $data = ['stat'=>[
-            'B'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0],
-            'C'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0],
+            'B'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0, 'sumExamGrade'=>0, 'sumGrade'=>0],
+            'C'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0, 'sumExamGrade'=>0, 'sumGrade'=>0],
             '2'=>0],
             'type'=>$type];
 
         foreach ($this->studentOfModule as $student) {
             $eduBasisid = Students::getStudentEDUBASISID($student->id_student);
 			$this->AllStudentsEduBasisid[$student->id_student] = $eduBasisid;
+            //new method to calculate averages - separate for budget and contract
+            $data['stat'][$eduBasisid]['sumExamGrade'] = $data['stat'][$eduBasisid]['sumExamGrade'] + $student->exam_grade;
+            $data['stat'][$eduBasisid]['sumGrade'] = $data['stat'][$eduBasisid]['sumGrade'] + $student->grade;
             if($student->exam_grade==0) {
                 $data['stat'][$eduBasisid]['2']++;
                 $data['stat']['2']++;
@@ -376,7 +400,6 @@ table {
             }
 
         }
-        
         return $data;
     }
 
