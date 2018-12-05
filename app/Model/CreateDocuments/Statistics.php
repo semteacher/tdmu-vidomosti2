@@ -134,8 +134,8 @@ class Statistics extends Model
 			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		}
 		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1">';
-        $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)';
-        $this->shablons['body'] .= '</td><td>Кількість студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість студентів , що склали дисципліну на \'відмінно\' (відсоток)';
+        $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість студентів, що склали дисципліну на \'незадовільно\' (відсоток)';
+        $this->shablons['body'] .= '</td><td>Кількість студентів, що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість студентів, що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість студентів, що склали дисципліну на \'відмінно\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Cередній бал </td> <td>Середній бал поточної успішності</td><td>Важкі</td><td>Легкі</td><td>Середній показник</td></tr>';
 
         $this->shablons['body'] .= $table.'</table>';
@@ -197,8 +197,8 @@ class Statistics extends Model
 			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		}
 		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
-        $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість контрактних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'незадовіль-но\' (відсоток)';
-        $this->shablons['body'] .= '</td><td>Кількість контрактних студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість контрактних студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість контрактних студентів , що склали дисципліну на \'відмінно\' (відсоток)</td><td>Кількість державних студентів , що склали дисципліну на \'відмінно\' (відсоток)';
+        $this->shablons['body'] .= '<tr><td>№</td><td>Курс</td><td> Назва дисципліни</td><td>Загальна кількість студентів</td><td>Кількість контрактних студентів, що склали дисципліну на \'незадовільно\' (відсоток)</td><td>Кількість державних студентів, що склали дисципліну на \'незадовільно\' (відсоток)';
+        $this->shablons['body'] .= '</td><td>Кількість контрактних студентів, що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість державних студентів, що склали дисципліну на \'задовільно\' (відсоток)</td><td>Кількість контрактних студентів, що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість державних студентів, що склали дисципліну на \'добре\' (відсоток)</td><td>Кількість контрактних студентів, що склали дисципліну на \'відмінно\' (відсоток)</td><td>Кількість державних студентів, що склали дисципліну на \'відмінно\' (відсоток)';
         $this->shablons['body'] .= '</td><td>Cередній бал контрактних студентів</td><td>Cередній бал державних студентів </td> <td>Середній бал поточної успішності контрактних студентів</td><td>Середній бал поточної успішності державних студентів</td></tr>';
         $this->shablons['body'] .= $table.'</table>';
 //        $this->shablons['body'] .= $this->formFooter();
@@ -347,6 +347,10 @@ table {
 
     private function convertGrades(){
         $qty = ($this->dataEachOfFile->qty_questions)?$this->dataEachOfFile->qty_questions:24; /*small bag fix because , because , because )))) ahahaha*/
+        //check if discipline is assigned to department!
+        if (empty((AllowedDiscipline::where('arrayAllowed', 'like', '%'.$this->dataEachOfFile->DisciplineVariantID.'%')->get()->first()))){
+            throw new \Exception('TDMU-Discipline not in "AllowedDiscipline"! Check if it assigned to department...');
+        } /*small bug fix because , because )))) 2018 - ahahaha*/
         $type = ($this->dataEachOfFile->type_exam_id==2)?'exam':($this->dataEachOfFile->type_exam_id==1)?(AllowedDiscipline::where('arrayAllowed', 'like', '%'.$this->dataEachOfFile->DisciplineVariantID.'%')->get()->first())?'exam':'dz':'dz';
         $fromConfigArray = $this->conver[$type][$qty];
 
