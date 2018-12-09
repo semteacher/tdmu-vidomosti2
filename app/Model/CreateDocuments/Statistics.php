@@ -154,6 +154,7 @@ class Statistics extends Model
         foreach ($this->dataOfFile as $this->dataEachOfFile) {
             $this->studentOfModule = Grades::where('grade_file_id', $this->dataEachOfFile->id)->get();
             $this->sumGrades = $this->getSumGradesFromEachStudent();
+//var_dump($this->sumGrades);
             $table .= '<tr><td>' . $i . '</td><td>' . $this->findSemester() . '</td>';
 			//if (count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]) > 1 ){
 			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
@@ -171,31 +172,11 @@ class Statistics extends Model
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['C']['5'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['5'] / count($this->studentOfModule)*100, 2).'%)</td>
                     <td>'.$this->sumGrades['gradeOfFiveTypes']['stat']['B']['5'].' ('.number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['5'] / count($this->studentOfModule)*100, 2).'%)</td>
                     ';
-            //$table .= '<td>' . number_format($this->sumGrades['examGrade'] / count($this->studentOfModule), 2) . '</td>';
-            //$table .= '<td>' . number_format($this->sumGrades['examGrade'] / count($this->studentOfModule), 2) . '</td>';
-            //$table .= '<td>' . number_format($this->sumGrades['grade'] / count($this->studentOfModule), 2) . '</td>';
-            //$table .= '<td>' . number_format($this->sumGrades['grade'] / count($this->studentOfModule), 2) . '</td>';
-            if ($this->EDUBASISIDLocal["C"] > 0) {
-                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['sumExamGrade'] / $this->EDUBASISIDLocal["C"], 2) . '</td>';
-            } else {
-                $table .= '<td>0</td>';
-            }
-            if ($this->EDUBASISIDLocal["B"] > 0) {
-                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['sumExamGrade'] / $this->EDUBASISIDLocal["B"], 2) . '</td>';
-            } else {
-                $table .= '<td>0</td>';
-            }
-            if ($this->EDUBASISIDLocal["C"] > 0) {
-                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['C']['sumGrade'] / $this->EDUBASISIDLocal["C"], 2) . '</td>';
-            } else {
-                $table .= '<td>0</td>';
-            }
-            if ($this->EDUBASISIDLocal["B"] > 0) {
-                $table .= '<td>' . number_format($this->sumGrades['gradeOfFiveTypes']['stat']['B']['sumGrade'] / $this->EDUBASISIDLocal["B"], 2) . '</td>';
-            } else {
-                $table .= '<td>0</td>';
-            }
-            $table .= '</td></tr>';
+            $table .= '<td>' . $this->sumGrades['gradeOfFiveTypes']['stat']['C']['avgExamGrade'] . '</td>';
+            $table .= '<td>' . $this->sumGrades['gradeOfFiveTypes']['stat']['B']['avgExamGrade'] . '</td>';
+            $table .= '<td>' . $this->sumGrades['gradeOfFiveTypes']['stat']['C']['avgGrade'] . '</td>';
+            $table .= '<td>' . $this->sumGrades['gradeOfFiveTypes']['stat']['B']['avgGrade'] . '</td>';
+            $table .= '</tr>';
             $i++;
         }
 		//new method to calc total students
@@ -386,17 +367,19 @@ table {
         $fromConfigArray = $this->conver[$type][$qty];
 
         $data = ['stat'=>[
-            'B'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0, 'sumExamGrade'=>0, 'sumGrade'=>0],
-            'C'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0, 'sumExamGrade'=>0, 'sumGrade'=>0],
+            'B'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0, 'sumExamGrade'=>0, 'sumGrade'=>0, 'studcount'=>0, 'avgExamGrade'=>0, 'avgGrade'=>0], 
+            'C'=>['2'=>0,'3'=>0, '4'=>0, '5'=>0, 'sumExamGrade'=>0, 'sumGrade'=>0, 'studcount'=>0, 'avgExamGrade'=>0, 'avgGrade'=>0], 
             '2'=>0],
             'type'=>$type];
 
         foreach ($this->studentOfModule as $student) {
             $eduBasisid = Students::getStudentEDUBASISID($student->id_student);
 			$this->AllStudentsEduBasisid[$student->id_student] = $eduBasisid;
-            //new method to calculate averages - separate for budget and contract
+            //new method to calculate averages - separate for budget and contract (2018)
             $data['stat'][$eduBasisid]['sumExamGrade'] = $data['stat'][$eduBasisid]['sumExamGrade'] + $student->exam_grade;
             $data['stat'][$eduBasisid]['sumGrade'] = $data['stat'][$eduBasisid]['sumGrade'] + $student->grade;
+            //get count of budget and contract PER EACH MODULE (2018)!
+            $data['stat'][$eduBasisid]['studcount']++;
             if($student->exam_grade==0) {
                 $data['stat'][$eduBasisid]['2']++;
                 $data['stat']['2']++;
@@ -410,6 +393,21 @@ table {
             }
 
         }
+        //calculate average grades in new way (2018)
+        if ($data['stat']['C']['studcount'] > 0) {
+            $data['stat']['C']['avgExamGrade'] = number_format($data['stat']['C']['sumExamGrade'] / $data['stat']['C']['studcount'], 2);
+            $data['stat']['C']['avgGrade'] = number_format($data['stat']['C']['sumGrade'] / $data['stat']['C']['studcount'], 2);
+        } else {
+            $data['stat']['C']['avgExamGrade'] = '-';
+            $data['stat']['C']['avgGrade'] = '-';
+        }
+        if ($data['stat']['B']['studcount'] > 0) {
+            $data['stat']['B']['avgExamGrade'] = number_format($data['stat']['B']['sumExamGrade'] / $data['stat']['B']['studcount'], 2);
+            $data['stat']['B']['avgGrade'] = number_format($data['stat']['B']['sumGrade'] / $data['stat']['B']['studcount'], 2);
+        } else {
+            $data['stat']['B']['avgExamGrade'] = '-';
+            $data['stat']['B']['avgGrade'] = '-';
+        }   
         return $data;
     }
 
