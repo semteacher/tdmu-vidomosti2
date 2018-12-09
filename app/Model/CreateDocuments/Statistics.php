@@ -125,12 +125,9 @@ class Statistics extends Model
 			$this->shablons['body'] .= $this->HTML2DOCHeader();
 			$this->shablons['body'] .= $this->formHeader();
             $this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')</p>';
-			//$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		} else {
-			//$this->shablons['body'] .= $this->formHeader();
             $this->shablons['body'] .= $this->formHeader('Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')');
-			//$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		}
 		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1">';
@@ -154,7 +151,6 @@ class Statistics extends Model
         foreach ($this->dataOfFile as $this->dataEachOfFile) {
             $this->studentOfModule = Grades::where('grade_file_id', $this->dataEachOfFile->id)->get();
             $this->sumGrades = $this->getSumGradesFromEachStudent();
-//var_dump($this->sumGrades);
             $table .= '<tr><td>' . $i . '</td><td>' . $this->findSemester() . '</td>';
 			//if (count($this->modulesByDiscipline[$this->dataEachOfFile->DisciplineVariantID]) > 1 ){
 			if ($this->dataEachOfFile->type_exam_id == 1 ){	//best - by exam type ID
@@ -187,14 +183,10 @@ class Statistics extends Model
 		if ($isDownload) {
 			$this->shablons['body'] .= $this->HTML2DOCHeader();
 			$this->shablons['body'] .= $this->formHeader();
-			//$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])) .' ( Бюджет - ' . $this->EDUBASISID["B"] .', Контракт - ' . $this->EDUBASISID["C"] .')</p>';
 			$this->shablons['body'] .= '<p style="font-size:12pt;">Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')</p>';
-			//$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 			$this->shablons['body'] .= '<p style="font-size:12pt;">Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		} else {
-			//$this->shablons['body'] .= $this->formHeader('Кількість студентів - '. strval(intval($this->EDUBASISID["B"])+intval($this->EDUBASISID["C"])).' ( Бюджет - ' . $this->EDUBASISID["B"] . ', Контракт - ' . $this->EDUBASISID["C"] .')');
 			$this->shablons['body'] .= $this->formHeader('Кількість студентів - '. count($this->AllStudentsEduBasisid) .' ( Бюджет - ' . $this->EDUBASISIDLocal["B"] . ', Контракт - ' . $this->EDUBASISIDLocal["C"] .')');
-			//$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)</p>';
 			$this->shablons['body'] .= '<p>Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)</p>';
 		}
 		$this->shablons['body'] .= '<table class="table table-hover" style="width:100%; font-size:9pt;" border="1" >';
@@ -211,10 +203,10 @@ class Statistics extends Model
     {
         $this->shablons['body'] = '';
         $this->shablons['title'] = trans("admin/modules/stat.detailStat");
-        $this->shablons['body'] .= $this->formHeader();
         
         foreach ($this->dataOfFile as $this->dataEachOfFile) {
             $this->studentOfModule = Grades::where('grade_file_id', $this->dataEachOfFile->id)->get()->sortBy('group');
+            $this->sumGrades = $this->getSumGradesFromEachStudent();
                 foreach ($this->studentOfModule as $student) {
                     $studentForForm[$student->group][$student->id_student][$this->dataEachOfFile->id]['grade'] = $student->grade;
                     $studentForForm[$student->group][$student->id_student][$this->dataEachOfFile->id]['examGrade'] = $student->exam_grade;
@@ -222,6 +214,8 @@ class Statistics extends Model
                 }
         }
 
+        if ($isDownload) { $this->shablons['body'] .= $this->HTML2DOCHeader(); }
+        $this->shablons['body'] .= $this->formHeader();
         $this->shablons['body'] .= '<table width="100%">';
         $this->shablons['body'] .= '<tr>';
         $this->shablons['body'] .= '<th>Група</th><th style="min-width:200px">П.І.Б</th>';
@@ -254,6 +248,7 @@ class Statistics extends Model
         $this->shablons['body'] .= '</table>';
 
         $this->shablons['body'] .= $this->formFooter();
+        if ($isDownload) {$this->shablons['body'] .= $this->HTML2DOCFooter();}
         return $this->shablons;
     }
 
@@ -270,7 +265,6 @@ class Statistics extends Model
     public function formFooter()
     {
         $text = '';
-		//$text .= '</table>Загальні дані: <br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->studentOfModule)*100, 2).'%)';
 		$text .= '</table>Загальні дані: <br> Не склало – '.count($this->countOfAll2).' ('.number_format(count($this->countOfAll2) / count($this->AllStudentsEduBasisid)*100, 2).'%)';
 
         return $text;

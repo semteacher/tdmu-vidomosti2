@@ -134,7 +134,7 @@ class DocumentsController extends Controller
                 return DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formGeneralBKStat.doc';
                 break;
             case "detailed":
-                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'formDetailedStat.doc', $doc->formDetailedStat()['body']);
+                File::put(public_path().DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formDetailedStat.doc', $doc->formDetailedStat(true)['body']);
                 return DIRECTORY_SEPARATOR .'tmp'. DIRECTORY_SEPARATOR .'stat'. DIRECTORY_SEPARATOR . $doc->docfilename .'-formDetailedStat.doc';
                 break;
         }
