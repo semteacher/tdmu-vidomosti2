@@ -52,7 +52,7 @@ class Students extends Model
     }
 
     static public function getStudentGroup($id){
-        return self::getStudentFromOtherDB($id)->GROUPNUM;
+        return Recoding::winToUtf(self::getStudentFromOtherDB($id)->GROUPNUM);
     }
 
     static public function getStudentFIO($id){

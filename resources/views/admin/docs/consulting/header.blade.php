@@ -11,7 +11,7 @@
 <p align=center><b><u>ДВНЗ «Тернопільський державний медичний університет імені І.Я. Горбачевського МОЗ України</u></b></p>
 <table class=guestbook width=625 align=center cellspacing=0 cellpadding=3 border=0>
     <tr>
-        <td width=80%> Факультет <u>{{ $this['department'] }}</u></td><td>Група_<u>{{ $this['group'] }}</u>___</td>
+        <td width=80%> Факультет <u>{{ $this['department'] }}</u></td><td>Група_<u>{{ $this['group'] }}</u>_</td>
     </tr>
     <tr>
         <td width=80%> <u>{{ $this['dataEachOfFile']->first()->EduYear }} / {{ ($this['dataEachOfFile']->first()->EduYear + 1)}}</u> навчальний рік</td><td>Курс _<u>{{ $this['semester'] }}</u>___</td>
