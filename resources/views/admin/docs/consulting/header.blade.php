@@ -8,7 +8,7 @@
 </head>
 <body>
 <p align=center>МІНІСТЕРСТВО ОХОРОНИ ЗДОРОВЯ УКРАЇНИ </p>
-<p align=center><b><u>ДВНЗ «Тернопільський державний медичний університет імені І.Я. Горбачевського МОЗ України</u></b></p>
+<p align=center><b><u>ТЕРНОПІЛЬСЬКИЙ НАЦІОНАЛЬНИЙ МЕДИЧНИЙ УНІВЕРСИТЕТ імені І.Я.Горбачевського</u></b></p>
 <table class=guestbook width=625 align=center cellspacing=0 cellpadding=3 border=0>
     <tr>
         <td width=80%> Факультет <u>{{ $this['department'] }}</u></td><td>Група_<u>{{ $this['group'] }}</u>_</td>
